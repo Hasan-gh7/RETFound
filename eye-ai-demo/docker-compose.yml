@@ -1,0 +1,9 @@
+services:
+  eye-ai-demo:
+    build: .
+    ports:
+      - "127.0.0.1:8001:8001"
+    environment:
+      EYE_AI_NO_BROWSER: "1"
+      RETFOUND_API_URL: "${RETFOUND_API_URL:?Set the existing RETFound HTTPS origin}"
+      RETFOUND_API_KEY: "${RETFOUND_API_KEY:?Set the private trial Bearer key}"

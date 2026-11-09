@@ -1,0 +1,21 @@
+{
+  "report_date": "2026-10-30",
+  "inference_rerun": false,
+  "checks": {
+    "record_count_1000": true,
+    "unique_image_hashes_1000": true,
+    "selection_hash_order_matches": true,
+    "confusion_matches_saved": true,
+    "accuracy_matches_saved": true,
+    "macro_f1_matches_saved": true,
+    "quadratic_kappa_matches_saved": true,
+    "binary_counts_match_saved": true,
+    "finite_normalized_scores_and_argmax": true
+  },
+  "source_hashes": {
+    "predictions.json": "9963bf0228e0975b7ca176e89d4bd4571e3f70412fffda28749cca25b04a775f",
+    "selection.json": "4a8b6bdc6804f2981f8da301a2a4b3611fd58b9179eb6f3e494d4f721653c8dd",
+    "audit.json": "677c3542de95b1f07fd65cdfc0f2c289e2ca071608b0ef65997fae4db500d0cf",
+    "completed.json": "92a725c4a7f593141b7930dc5f37e3bc52ba3152f4d89df855a2e829c8571984"
+  }
+}

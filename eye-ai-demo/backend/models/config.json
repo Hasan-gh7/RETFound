@@ -1,0 +1,28 @@
+{
+  "diabetic_retinopathy": {
+    "filename": "dr_model.onnx",
+    "task": "multiclass",
+    "classes": 5,
+    "input_size": [224, 224],
+    "normalization": "imagenet",
+    "output_is_probabilities": false
+  },
+  "amd": {
+    "filename": "amd_model.onnx",
+    "task": "binary",
+    "input_size": [224, 224],
+    "normalization": "imagenet",
+    "output_is_probabilities": false,
+    "positive_index": 1,
+    "threshold": 0.63
+  },
+  "glaucoma": {
+    "filename": "glaucoma_model.onnx",
+    "task": "binary",
+    "input_size": [224, 224],
+    "normalization": "imagenet",
+    "output_is_probabilities": false,
+    "positive_index": 1,
+    "threshold": 0.66
+  }
+}

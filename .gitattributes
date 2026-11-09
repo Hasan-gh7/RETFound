@@ -1,0 +1,2 @@
+# Model assets, datasets, and archives are excluded by .gitignore.
+# Small source images use regular Git; this source-only repository needs no LFS.

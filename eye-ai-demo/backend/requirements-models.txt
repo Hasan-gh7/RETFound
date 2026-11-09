@@ -1,0 +1,3 @@
+# The demo delegates all inference to the existing RETFound API.
+# No ONNX runtime or model weights are needed here.
+-r requirements.txt

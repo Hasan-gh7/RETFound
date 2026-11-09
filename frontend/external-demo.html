@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>RETFound external API demo</title><script src="/external-demo.js" defer></script></head>
+<body><main>
+<h1>RETFound external API demo</h1>
+<p>Analyze a retinal fundus image through this server's API. Images pass through Cloudflare and Jev/OpenRouter screening before RETFound.</p>
+<p><label>RETFound access key <input id="key" type="password" autocomplete="off" size="48"></label></p>
+<p>Use the key from connection.json, not your OpenRouter key. It stays in this page's memory and is cleared on reload.</p>
+<button id="check" type="button">Check connection</button>
+<p><label>Image <input id="image" type="file" accept="image/jpeg,image/png,image/tiff,image/bmp,image/webp"></label></p>
+<button id="predict" type="button">Analyze image</button>
+<p id="status" role="status" aria-live="polite">Enter your access key to begin.</p>
+<pre id="result"></pre>
+<p>Scores are uncalibrated research outputs, not a clinical diagnosis. Send requests sequentially. Reload after an uncertain timeout only after checking the server; do not automatically repeat requests.</p>
+</main></body></html>

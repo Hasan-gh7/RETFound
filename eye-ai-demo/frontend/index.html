@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b6b76" />
+  <meta name="description" content="ديمو عربي لتحليل صور قاع العين بالذكاء الاصطناعي" />
+  <title>عينك AI | فحص شبكية العين</title>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="العودة إلى بداية الصفحة">
+        <img src="assets/logo.svg" alt="" width="46" height="46" />
+        <span>
+          <strong>عينك <em>AI</em></strong>
+          <small>فحص أولي لصور قاع العين</small>
+        </span>
+      </a>
+      <div class="header-actions">
+        <span id="engineBadge" class="badge badge-demo">الاتصال غير متحقق</span>
+        <button id="historyBtn" class="btn btn-ghost" type="button" aria-haspopup="dialog">
+          <span aria-hidden="true">◷</span>
+          السجل المحفوظ
+          <span id="historyCount" class="count-pill">0</span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="heroTitle">
+        <div>
+          <span class="eyebrow">واجهة واحدة • استخدام بسيط • متوافقة مع الجوال</span>
+          <h1 id="heroTitle">تحليل صور قاع العين باستخدام RETFound</h1>
+          <p>يتصل هذا الديمو بخادم RETFound الحالي لتصنيف اعتلال الشبكية السكري من 0 إلى 4 بعد فحص Jev. لا يتوفر تحليل AMD أو الجلوكوما.</p>
+        </div>
+        <div class="hero-orbit" aria-hidden="true">
+          <div class="orbit orbit-one"></div>
+          <div class="orbit orbit-two"></div>
+          <div class="eye-core"><span></span></div>
+        </div>
+      </section>
+
+      <aside class="medical-notice" role="note">
+        <span class="notice-icon" aria-hidden="true">!</span>
+        <div>
+          <strong>تنبيه طبي مهم</strong>
+          <p>هذا نموذج أولي للتوضيح التقني، ولا يقدّم تشخيصًا طبيًا ولا يغني عن فحص اختصاصي العيون. لا تتخذ أي قرار علاجي اعتمادًا على هذه النتيجة.</p>
+        </div>
+      </aside>
+
+      <p id="connectionStatus" role="status">جارٍ التحقق من اتصال RETFound…</p>
+      <p id="analysisError" class="medical-notice" role="alert" hidden></p>
+      <section class="workspace" aria-label="منطقة الفحص">
+        <div class="main-column">
+          <article class="panel patient-panel">
+            <div class="panel-heading">
+              <div class="step-number">1</div>
+              <div>
+                <h2>معلومات الحالة <span class="optional">اختيارية</span></h2>
+                <p>تظهر هذه البيانات داخل التقرير المحفوظ فقط.</p>
+              </div>
+            </div>
+            <div class="form-grid">
+              <label class="field field-wide">
+                <span>اسم المراجع</span>
+                <input id="patientName" type="text" autocomplete="name" maxlength="80" placeholder="مثال: أحمد محمد" />
+              </label>
+              <label class="field">
+                <span>رقم الملف</span>
+                <input id="patientId" type="text" maxlength="40" placeholder="اختياري" />
+              </label>
+              <label class="field">
+                <span>العمر</span>
+                <input id="patientAge" type="number" min="1" max="120" inputmode="numeric" placeholder="مثال: 54" />
+              </label>
+              <label class="field">
+                <span>العين</span>
+                <select id="eyeSide">
+                  <option value="غير محددة">غير محددة</option>
+                  <option value="اليمنى">اليمنى</option>
+                  <option value="اليسرى">اليسرى</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>الجنس</span>
+                <select id="patientSex">
+                  <option value="غير محدد">غير محدد</option>
+                  <option value="ذكر">ذكر</option>
+                  <option value="أنثى">أنثى</option>
+                </select>
+              </label>
+            </div>
+          </article>
+
+          <article class="panel upload-panel">
+            <div class="panel-heading">
+              <div class="step-number">2</div>
+              <div>
+                <h2>صورة قاع العين</h2>
+                <p>استخدم صورة واضحة ومتمركزة، بصيغة JPG أو PNG أو WEBP.</p>
+              </div>
+            </div>
+
+            <div id="dropZone" class="drop-zone" tabindex="0" role="button" aria-label="رفع صورة قاع العين">
+              <input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp" hidden />
+              <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden />
+              <div id="emptyUploadState" class="empty-upload">
+                <div class="upload-icon" aria-hidden="true">
+                  <svg viewBox="0 0 64 64" width="52" height="52"><path d="M32 42V14m0 0L21 25m11-11 11 11M14 38v8a6 6 0 0 0 6 6h24a6 6 0 0 0 6-6v-8" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <h3>اسحب الصورة هنا أو اختر طريقة الإدخال</h3>
+                <p>الحد الأقصى 10 ميغابايت</p>
+                <div class="upload-actions">
+                  <button id="browseBtn" class="btn btn-primary" type="button">اختيار من الجهاز</button>
+                  <button id="cameraBtn" class="btn btn-secondary" type="button">التقاط بالكاميرا</button>
+                </div>
+              </div>
+
+              <div id="previewState" class="preview-state" hidden>
+                <div class="preview-frame">
+                  <img id="previewImage" alt="معاينة صورة العين المختارة" />
+                  <div class="scan-line" aria-hidden="true"></div>
+                  <button id="removeImageBtn" class="icon-btn remove-image" type="button" aria-label="حذف الصورة">×</button>
+                </div>
+                <div class="preview-meta">
+                  <div>
+                    <strong id="fileName">—</strong>
+                    <span id="fileInfo">—</span>
+                  </div>
+                  <div id="qualityChip" class="quality-chip">جارٍ فحص الجودة…</div>
+                </div>
+                <ul id="qualityWarnings" class="quality-warnings" aria-live="polite"></ul>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel analyze-panel">
+            <div class="panel-heading compact-heading">
+              <div class="step-number">3</div>
+              <div>
+                <h2>بدء التحليل</h2>
+                <p>فحص Jev ثم تصنيف RETFound الحقيقي لاعتلال الشبكية السكري.</p>
+              </div>
+            </div>
+
+            <div class="model-list" aria-label="الموديلات المستخدمة">
+              <div class="model-row">
+                <span class="model-icon dr-icon" aria-hidden="true">DR</span>
+                <div><strong>اعتلال الشبكية السكري</strong><small>تصنيف من الدرجة 0 إلى 4</small></div>
+                <span class="model-status">5 فئات</span>
+              </div>
+              <div class="model-row">
+                <span class="model-icon amd-icon" aria-hidden="true">AMD</span>
+                <div><strong>الضمور البقعي</strong><small>لم يتم التقييم — لا يوجد موديل</small></div>
+                <span class="model-status">غير متاح</span>
+              </div>
+              <div class="model-row">
+                <span class="model-icon gl-icon" aria-hidden="true">GL</span>
+                <div><strong>الجلوكوما المتقدمة</strong><small>لم يتم التقييم — لا يوجد موديل</small></div>
+                <span class="model-status">غير متاح</span>
+              </div>
+            </div>
+
+            <label class="consent-row">
+              <input id="consentCheck" type="checkbox" />
+              <span>أوافق على إرسال الصورة إلى خادم RETFound وخدمة Jev الخارجية، وأفهم أن النتيجة بحثية وليست تشخيصًا.</span>
+            </label>
+
+            <button id="analyzeBtn" class="btn btn-analyze" type="button" disabled>
+              <span class="btn-spark" aria-hidden="true">✦</span>
+              تحليل الصورة الآن
+            </button>
+          </article>
+
+          <section id="analysisProgress" class="panel progress-panel" hidden aria-live="polite">
+            <div class="progress-top">
+              <div>
+                <span class="eyebrow">جاري التحليل</span>
+                <h2 id="progressTitle">تهيئة الصورة…</h2>
+              </div>
+              <strong id="progressPercent">0%</strong>
+            </div>
+            <div class="progress-track"><span id="progressBar"></span></div>
+            <div class="progress-steps">
+              <span data-progress-step="1">التحقق من الجودة</span>
+              <span data-progress-step="2">انتظار Jev وRETFound</span>
+              <span data-progress-step="3">تجميع النتيجة</span>
+            </div>
+          </section>
+
+          <section id="resultsSection" class="results-section" hidden aria-live="polite">
+            <div class="results-header">
+              <div>
+                <span class="eyebrow">اكتمل الفحص الأولي</span>
+                <h2>نتيجة التحليل</h2>
+                <p id="resultTimestamp">—</p>
+              </div>
+              <span id="resultModeBadge" class="badge badge-demo">نتيجة بحثية</span>
+            </div>
+
+            <div id="demoWarning" class="demo-warning" hidden>
+              <strong>نطاق النتيجة: اعتلال الشبكية السكري فقط.</strong>
+              لم يتم تقييم AMD أو الجلوكوما. الدرجات الخمس هي درجات نموذج غير معايرة، وليست احتمالات سريرية.
+            </div>
+
+            <div id="summaryBanner" class="summary-banner">
+              <div class="summary-symbol" aria-hidden="true">✓</div>
+              <div>
+                <strong id="summaryTitle">—</strong>
+                <p id="summaryText">—</p>
+              </div>
+            </div>
+
+            <p id="modelIdentity" class="model-provenance"></p>
+            <details><summary>درجات النموذج للفئات الخمس</summary><ol id="drScores" start="0"></ol></details>
+            <div class="result-grid">
+              <article class="result-card result-card-wide">
+                <div class="result-card-head">
+                  <div>
+                    <span class="model-icon dr-icon" aria-hidden="true">DR</span>
+                    <div><h3>اعتلال الشبكية السكري</h3><p>المقياس من 0 إلى 4</p></div>
+                  </div>
+                  <span id="drEngine" class="engine-tag">—</span>
+                </div>
+                <div class="dr-result-main">
+                  <div id="drGradeCircle" class="grade-circle"><strong id="drGrade">—</strong><span>/ 4</span></div>
+                  <div>
+                    <span class="result-label">التصنيف المتوقع</span>
+                    <h4 id="drLabel">—</h4>
+                    <p id="drConfidence">—</p>
+                  </div>
+                </div>
+                <div id="drScale" class="grade-scale" aria-label="مقياس درجات اعتلال الشبكية">
+                  <span data-grade="0">0</span><span data-grade="1">1</span><span data-grade="2">2</span><span data-grade="3">3</span><span data-grade="4">4</span>
+                </div>
+                <div class="confidence-row"><span>درجة النموذج غير المعايرة</span><strong id="drConfidenceValue">—</strong></div>
+                <div class="confidence-bar"><span id="drConfidenceBar"></span></div>
+              </article>
+
+              <article class="result-card">
+                <div class="result-card-head">
+                  <div>
+                    <span class="model-icon amd-icon" aria-hidden="true">AMD</span>
+                    <div><h3>الضمور البقعي</h3><p>لا يوجد موديل مرتبط</p></div>
+                  </div>
+                  <span id="amdEngine" class="engine-tag">—</span>
+                </div>
+                <div id="amdStatus" class="binary-status"><span class="status-dot"></span><strong>—</strong></div>
+                <div class="confidence-row"><span>حالة التقييم</span><strong id="amdProbability">—</strong></div>
+                <div class="confidence-bar"><span id="amdConfidenceBar"></span></div>
+              </article>
+
+              <article class="result-card">
+                <div class="result-card-head">
+                  <div>
+                    <span class="model-icon gl-icon" aria-hidden="true">GL</span>
+                    <div><h3>الجلوكوما المتقدمة</h3><p>لا يوجد موديل مرتبط</p></div>
+                  </div>
+                  <span id="glEngine" class="engine-tag">—</span>
+                </div>
+                <div id="glStatus" class="binary-status"><span class="status-dot"></span><strong>—</strong></div>
+                <div class="confidence-row"><span>حالة التقييم</span><strong id="glProbability">—</strong></div>
+                <div class="confidence-bar"><span id="glConfidenceBar"></span></div>
+              </article>
+            </div>
+
+            <article class="next-step-card">
+              <div class="next-step-icon" aria-hidden="true">＋</div>
+              <div>
+                <h3>الخطوة التالية</h3>
+                <p id="nextStepText">اعرض الصورة والنتيجة على اختصاصي عيون، خاصة عند وجود أعراض أو عوامل خطورة.</p>
+              </div>
+            </article>
+
+            <div class="result-actions">
+              <button id="saveBtn" class="btn btn-primary" type="button">حفظ الحالة</button>
+              <button id="printBtn" class="btn btn-secondary" type="button">طباعة / حفظ PDF</button>
+              <button id="downloadJsonBtn" class="btn btn-ghost" type="button">تنزيل بيانات JSON</button>
+              <button id="newAnalysisBtn" class="btn btn-link" type="button">فحص صورة جديدة</button>
+            </div>
+          </section>
+        </div>
+
+        <aside class="side-column">
+          <article class="panel privacy-card">
+            <div class="side-card-icon" aria-hidden="true">⌁</div>
+            <h3>الخصوصية أولًا</h3>
+            <p>تُرسل الصورة الأصلية إلى خادم RETFound، الذي يرسل نسخة إلى خدمة Jev الخارجية للتحقق من قاع العين. معلومات الحالة لا تُرسل مع التحليل. الحفظ الاختياري يحتفظ بالبيانات والصورة داخل هذا المتصفح.</p>
+          </article>
+          <article class="panel tips-card">
+            <h3>نصائح لصورة أفضل</h3>
+            <ul>
+              <li><span>1</span>استخدم صورة أصلية عالية الدقة.</li>
+              <li><span>2</span>تأكد أن الشبكية ظاهرة داخل الإطار.</li>
+              <li><span>3</span>تجنب الصور شديدة الظلام أو السطوع.</li>
+              <li><span>4</span>لا تستخدم لقطة شاشة لتقرير قديم.</li>
+            </ul>
+          </article>
+          <article class="panel scale-card">
+            <h3>درجات اعتلال الشبكية</h3>
+            <div class="scale-key"><span class="grade-dot grade-0"></span><div><strong>0</strong><small>لا توجد علامات ظاهرة</small></div></div>
+            <div class="scale-key"><span class="grade-dot grade-1"></span><div><strong>1</strong><small>خفيف</small></div></div>
+            <div class="scale-key"><span class="grade-dot grade-2"></span><div><strong>2</strong><small>متوسط</small></div></div>
+            <div class="scale-key"><span class="grade-dot grade-3"></span><div><strong>3</strong><small>شديد</small></div></div>
+            <div class="scale-key"><span class="grade-dot grade-4"></span><div><strong>4</strong><small>تكاثري / متقدم</small></div></div>
+          </article>
+        </aside>
+      </section>
+    </main>
+
+    <footer>
+      <p>عينك AI — نموذج أولي تعليمي، وليس جهازًا طبيًا معتمدًا.</p>
+      <p>يجب التحقق السريري من جميع النتائج بواسطة مختص مؤهل.</p>
+    </footer>
+  </div>
+
+  <dialog id="historyDialog" class="history-dialog">
+    <div class="dialog-head">
+      <div><span class="eyebrow">محفوظ على هذا الجهاز</span><h2>سجل الحالات</h2></div>
+      <button id="closeHistoryBtn" class="icon-btn" type="button" aria-label="إغلاق">×</button>
+    </div>
+    <div id="historyEmpty" class="history-empty">
+      <span aria-hidden="true">◷</span>
+      <h3>لا توجد حالات محفوظة بعد</h3>
+      <p>بعد ظهور النتيجة اضغط «حفظ الحالة» لتظهر هنا.</p>
+    </div>
+    <div id="historyList" class="history-list"></div>
+    <div class="dialog-footer">
+      <button id="exportAllBtn" class="btn btn-secondary" type="button">تصدير السجل JSON</button>
+      <button id="clearHistoryBtn" class="btn btn-danger" type="button">حذف جميع الحالات</button>
+    </div>
+  </dialog>
+
+  <section id="printReport" class="print-report" aria-hidden="true">
+    <header class="report-header">
+      <div class="report-brand"><img src="assets/logo.svg" alt="" /><div><strong>عينك AI</strong><span>تقرير فحص أولي لصورة قاع العين</span></div></div>
+      <div class="report-meta"><strong id="reportId">—</strong><span id="reportDate">—</span></div>
+    </header>
+    <div class="report-alert">هذا التقرير تجريبي ولا يُعد تشخيصًا طبيًا. يجب مراجعته بواسطة اختصاصي عيون.</div>
+    <section class="report-patient">
+      <h2>بيانات الحالة</h2>
+      <div class="report-data-grid">
+        <p><span>الاسم</span><strong id="reportPatientName">—</strong></p>
+        <p><span>رقم الملف</span><strong id="reportPatientId">—</strong></p>
+        <p><span>العمر</span><strong id="reportPatientAge">—</strong></p>
+        <p><span>العين</span><strong id="reportEyeSide">—</strong></p>
+      </div>
+    </section>
+    <section class="report-body">
+      <div class="report-image-wrap"><img id="reportImage" alt="صورة قاع العين في التقرير" /></div>
+      <div class="report-results">
+        <div><span>اعتلال الشبكية السكري</span><strong id="reportDr">—</strong><small id="reportDrConf">—</small></div>
+        <div><span>الضمور البقعي</span><strong id="reportAmd">—</strong><small id="reportAmdConf">—</small></div>
+        <div><span>الجلوكوما المتقدمة</span><strong id="reportGl">—</strong><small id="reportGlConf">—</small></div>
+      </div>
+    </section>
+    <section class="report-summary"><h2>الخلاصة</h2><p id="reportSummary">—</p></section>
+    <section class="report-technical">
+      <h2>معلومات تقنية</h2>
+      <p id="reportProvenance" class="model-provenance"></p>
+      <p><span>نمط الاستدلال</span><strong id="reportMode">—</strong></p>
+      <p><span>جودة الصورة</span><strong id="reportQuality">—</strong></p>
+    </section>
+    <footer class="report-footer">
+      <div><span>اسم الطبيب / المختص</span><b></b></div>
+      <div><span>التوقيع</span><b></b></div>
+      <p>لا تستخدم هذا التقرير لاتخاذ قرار علاجي دون تقييم سريري شامل.</p>
+    </footer>
+  </section>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="config.js"></script>
+  <script src="result-contract.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+{
+  "info": {
+    "name": "RETFound local image prediction",
+    "description": "Use Postman Desktop or the web app with Desktop Agent. Start run_web.bat, send Health, then open Predict image > Body > form-data and select a local file for image. Do not manually set Content-Type: Postman supplies the multipart boundary. Images go only to the local RETFound server.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Server ready', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().status).to.eql('ready'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Model identity",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/model"
+      }
+    },
+    {
+      "name": "3. Predict image",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{base_url}}/api/predict",
+        "description": "Select a retinal fundus image. New images go directly to the real model with no prior approval. The model does not detect non-retinal images. Maximum 20 MiB. Leave Content-Type unset so Postman creates the boundary.",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "image",
+              "type": "file",
+              "src": [],
+              "description": "Select a local JPEG, PNG, TIFF, BMP or WebP file."
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Prediction or image validation error', () => pm.expect([200, 422]).to.include(pm.response.code));",
+              "if (pm.response.code === 200) {",
+              "  const result = pm.response.json();",
+              "  pm.test('Image decoded for direct inference', () => pm.expect(result.input_validation.status).to.eql('decoded'));",
+              "  pm.test('Five finite scores', () => { pm.expect(result.scores).to.have.lengthOf(5); result.scores.forEach(s => pm.expect(Number.isFinite(s) && s >= 0 && s <= 1).to.eql(true)); });",
+              "  pm.test('Grade matches highest score', () => pm.expect(result.predicted_grade).to.eql(result.scores.indexOf(Math.max(...result.scores))));",
+              "  pm.test('Scores sum to one', () => pm.expect(result.scores.reduce((a,b) => a+b, 0)).to.be.closeTo(1, 0.000001));",
+              "}",
+              "if (pm.response.code === 422) {",
+              "  const result = pm.response.json();",
+              "  pm.test('No disease grade for a rejected input', () => { pm.expect(result).not.to.have.property('predicted_grade'); pm.expect(result).not.to.have.property('scores'); });",
+              "}"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
